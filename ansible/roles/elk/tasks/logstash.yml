@@ -1,0 +1,58 @@
+---
+# ======== Logstash Repo ===========
+- name: Copy logstash.repo information
+  copy:
+   src: logstash.repo
+   dest: /etc/yum.repos.d/
+   owner: root
+   group: root
+
+- name: Import Logstash rpm key from url
+  rpm_key:
+   state: present
+   key: https://artifacts.elastic.co/GPG-KEY-elasticsearch    
+
+# ======== Install ===========
+
+- name: Install Logstash.
+  yum:
+    name: logstash
+    state: present
+
+- name: Configure Logstash
+  template:
+    src: logstash.yml.j2
+    dest: /etc/logstash/logstash.yml
+    owner: logstash
+    group: logstash
+    mode: 0750
+  notify: restart logstash
+
+- name: Configure Logstash | local-syslog-input
+  template:
+    src: logstash/05-local-syslog-input.conf.j2
+    dest: /etc/logstash/conf.d/05-local-syslog-input.conf.j2
+    owner: logstash
+    group: logstash
+    mode: 0750
+  notify: restart logstash
+  when: elk_logstash_local_syslog_input
+
+- name: Configure Logstash | beats-input
+  template:
+    src: logstash/10-beats-input.conf.j2
+    dest: /etc/logstash/conf.d/10-beats-input.conf.j2
+    owner: logstash
+    group: logstash
+    mode: 0750
+  notify: restart logstash
+  when: elk_logstash_input_beats
+
+- name: Configure Logstash | elasticsearch-output
+  template:
+    src: logstash/90-elasticsearch-output.conf.j2
+    dest: /etc/logstash/conf.d/90-elasticsearch-output.conf.j2
+    owner: logstash
+    group: logstash
+    mode: 0750
+  notify: restart logstash

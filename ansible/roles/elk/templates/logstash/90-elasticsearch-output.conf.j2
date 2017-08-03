@@ -1,0 +1,7 @@
+output {
+  elasticsearch {
+    hosts => [ "{{ elk_logstash_elasticsearch | join('", "') }}" ]
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"
+    document_type => "%{[@metadata][type]}"
+  }
+}

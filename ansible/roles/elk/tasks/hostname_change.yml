@@ -1,0 +1,5 @@
+---
+# ======== Host Name Change ===========
+- name: Change the hostname to inventory default
+  hostname:
+      name: "{{ inventory_hostname }}"

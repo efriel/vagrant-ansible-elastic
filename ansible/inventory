@@ -1,0 +1,5 @@
+[elk]
+172.168.3.25
+
+[elk:vars]
+ansible_password=vagrant

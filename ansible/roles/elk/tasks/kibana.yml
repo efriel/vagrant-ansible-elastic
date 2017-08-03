@@ -1,0 +1,42 @@
+---
+# ======== Kibana Repo ===========
+- name: Copy kibana.repo information
+  copy:
+   src: kibana.repo
+   dest: /etc/yum.repos.d/
+   owner: root
+   group: root
+
+- name: Import Kibana rpm key from url
+  rpm_key:
+   state: present
+   key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+# ======== Install ===========
+
+- name: Install Kibana.
+  yum:
+    name: kibana
+    state: present
+
+  # ======== Configure ===========
+
+
+- name: Configure Kibana
+  template:
+    src: kibana.yml.j2
+    dest: /etc/kibana/kibana.yml
+    owner: kibana
+    group: kibana
+    mode: 0750
+  notify: restart kibana
+
+- name: Installing X-Pack to Kibana
+  shell: yes | ./bin/kibana-plugin install x-pack
+  args:
+    chdir: /usr/share/kibana
+    creates: /usr/share/kibana/plugins/x-pack/package.json
+  become: yes
+  become_user: kibana
+  notify: restart kibana
+  when: "{{ elk_kibana_xpack }}"

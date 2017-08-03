@@ -1,0 +1,7 @@
+
+# ======== System Update ===========
+- name: System update
+  yum:
+   name: "*"
+   state: latest
+

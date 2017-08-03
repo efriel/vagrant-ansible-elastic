@@ -1,0 +1,24 @@
+---
+
+
+- include: hostname_change.yml
+- include: system_update.yml
+- include: java_install.yml
+- include: firewall_services.yml
+#- include: map_setup.yml
+
+- include: elasticsearch.yml
+- include: logstash.yml
+- include: kibana.yml
+
+- name: Start Elasticsearch
+  service: name=elasticsearch state=started enabled=yes
+
+- name: Make sure Elasticsearch is running before proceeding
+  wait_for: port="{{ elk_elasticsearch_http_port }}" delay=3 timeout=300
+
+- name: Start Logstash
+  service: name=logstash state=started enabled=yes
+
+- name: Start Kibana
+  service: name=kibana state=started enabled=yes
